@@ -1,0 +1,15 @@
+# Konfigurasi default
+spring:
+  application:
+    name: BackendServiceApplication
+  config:
+    import: application-profiles.yml
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+      dialect: org.hibernate.dialect.PostgreSQLDialect
+
+    show-sql: true
+
+server:
+  port: 8080
