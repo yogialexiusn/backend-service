@@ -12,9 +12,7 @@ import org.backend.response.GetUserAccessListResponse;
 import org.backend.response.embedded.*;
 import org.backend.service.UserAcess;
 import org.springframework.stereotype.Service;
-
 import java.util.*;
-
 
 @Service
 public class UserAcessImpl implements UserAcess {
