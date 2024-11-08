@@ -10,12 +10,12 @@ import org.backend.request.CreateAccessRequest;
 import org.backend.request.CreateUserRequest;
 import org.backend.response.GetUserAccessListResponse;
 import org.backend.response.embedded.*;
-import org.backend.service.UserAcess;
+import org.backend.service.IUserAcess;
 import org.springframework.stereotype.Service;
 import java.util.*;
 
 @Service
-public class UserAcessImpl implements UserAcess {
+public class UserAcessImpl implements IUserAcess {
 
     List<String> accessMenu = Arrays.asList("CAREER", "NEWS");
 

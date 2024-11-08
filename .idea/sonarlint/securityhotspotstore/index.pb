@@ -21,8 +21,6 @@ p
 @src/main/java/org/backend/validator/ValueMustValidValidator.java,9\d\9d3a889f2e7a57ad95675d084fa4434d25dd896f
 h
 8src/main/java/org/backend/validation/ValueMustValid.java,6\6\661c61fd7b2fde658e7a9db298eca626fae3f056
-`
-0src/main/java/org/backend/service/UserAcess.java,5\1\51b20a548a470ff3ed36deff0b232f650ec60915
 i
 9src/main/java/org/backend/service/impl/UserAcessImpl.java,c\9\c9f525ca3cb98570930d431005320f1bed710164
 h
@@ -60,3 +58,25 @@ Asrc/main/java/org/backend/response/GetUserAccessListResponse.java,4\5\45fb0ef9
 :
 
 .gitignore,a\5\a5cc2925ca8258af241be7e5b0381edf30266302
+h
+8src/main/java/org/backend/controller/NewsController.java,0\5\0515ad08af23e9481c5850f0fbefad570e54b069
+h
+8src/main/java/org/backend/repository/NewsRepository.java,8\a\8afe36e4e3df95a573943b47ca58fcde2da5cb42
+Z
+*src/main/java/org/backend/entity/News.java,b\f\bfcc77e30e2a3b4024d5ef54987ac930b3171af3
+b
+2src/main/java/org/backend/request/NewsRequest.java,9\2\9283619952912adb610c1571b5d9c57f731913bb
+a
+1src/main/java/org/backend/service/IUserAcess.java,0\f\0fa3af7654a05755c715889f734ecd4e347f0d93
+\
+,src/main/java/org/backend/service/INews.java,d\3\d3d53c8635f4177f0dfd08027330754952b0e3d7
+d
+4src/main/java/org/backend/service/impl/NewsImpl.java,a\a\aa609e33b5ceb5575102dd4250ce222831a4372e
+s
+Csrc/main/java/org/backend/response/embedded/CreateNewsResponse.java,e\f\ef0751d46ac152c35a908c2abddb73c74217e29f
+q
+Asrc/main/java/org/backend/response/embedded/ViewNewsResponse.java,8\8\88d480c84594807be601fb62045e97b48624cb02
+l
+<src/main/java/org/backend/response/ViewNewsListResponse.java,a\c\acd1a61344b22185ca5786af0e9e4bbc20abf928
+s
+Csrc/main/java/org/backend/response/embedded/ViewNewsIdResponse.java,0\a\0aeedbd098113fc20f0a85500d0e4465dab8176d

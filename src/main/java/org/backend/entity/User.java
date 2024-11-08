@@ -17,5 +17,4 @@ public class User {
     @Id
     private String username;
     private boolean status;
-
 }

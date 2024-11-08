@@ -5,7 +5,7 @@ import org.backend.request.CreateAccessRequest;
 import org.backend.request.CreateUserRequest;
 import org.backend.response.GetUserAccessListResponse;
 import org.backend.response.embedded.*;
-import org.backend.service.UserAcess;
+import org.backend.service.IUserAcess;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -17,35 +17,36 @@ import javax.validation.Valid;
 @Validated
 public class UserAccessController extends BaseController{
 
-    private final UserAcess userAcess;
+    private final IUserAcess iUserAcess;
 
-    public UserAccessController(UserAcess userAcess) {
-        this.userAcess = userAcess;
+    public UserAccessController(IUserAcess iUserAcess) {
+        this.iUserAcess = iUserAcess;
     }
 
     @GetMapping("/{username}")
     public ResponseEntity<GetUserResponse> getUser(@PathVariable String username) {
-        return execute(userAcess.getUser(username));
+        return execute(iUserAcess.getUser(username));
     }
 
     @PostMapping
+    @CrossOrigin(origins = "*")
     public ResponseEntity<CreateUserResponse> createUser(@RequestBody @Valid CreateUserRequest request) {
-        return execute(userAcess.createUser(request));
+        return execute(iUserAcess.createUser(request));
     }
 
     @PostMapping("/blockUser")
     public ResponseEntity<BlockUserResponse> blockUser(@RequestBody BlockUserRequest request) {
-        return execute(userAcess.blockUser(request));
+        return execute(iUserAcess.blockUser(request));
     }
 
     @GetMapping("/access/{username}")
     public ResponseEntity<GetUserAccessListResponse> getUserAccess(@PathVariable String username) {
-        return execute(userAcess.getUserAccess(username));
+        return execute(iUserAcess.getUserAccess(username));
     }
 
     @PostMapping("/access")
     public ResponseEntity<CreateAccessResponse> addAccess(@RequestBody @Valid CreateAccessRequest request) {
-        return execute(userAcess.createAccess(request));
+        return execute(iUserAcess.createAccess(request));
     }
 
 }

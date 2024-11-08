@@ -6,8 +6,7 @@ import org.backend.request.CreateUserRequest;
 import org.backend.response.GetUserAccessListResponse;
 import org.backend.response.embedded.*;
 
-
-public interface UserAcess {
+public interface IUserAcess {
     CreateUserResponse createUser(CreateUserRequest request);
     BlockUserResponse blockUser(BlockUserRequest request);
     CreateAccessResponse createAccess(CreateAccessRequest request);

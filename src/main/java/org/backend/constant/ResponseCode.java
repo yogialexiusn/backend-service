@@ -12,6 +12,7 @@ public enum ResponseCode {
     USER_ACCESS_NOTFOUND("004", "User access not found"),
     USERNAME_NOTFOUND("005", "Username not found"),
     USERNAME_ALREADY_DEACTIVE("006", "Username already deactive"),
+    NEWS_NOTFOUND("007", "News not found"),
     REQ_FORMAT_ERROR("101", "Format error");
 
     private String code;
