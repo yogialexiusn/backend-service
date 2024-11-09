@@ -8,5 +8,8 @@ public class CreateUserRequest {
     private String username;
     @ValueMustValid(valueAllowed = {"SUPERADMIN", "ADMIN", "VIEWER"})
     private String role;
+    private String name;
+    private String email;
+    private String password;
 
 }

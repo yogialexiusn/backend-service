@@ -19,6 +19,8 @@ public class CreateUserResponse extends BaseResponseDTO {
     @AllArgsConstructor
     public static class DTO {
         private String username;
+        private String name;
+        private String email;
     }
 
     public static CreateUserResponse buildResponse(DTO detail, ResponseCode responseCode) {

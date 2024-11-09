@@ -31,6 +31,8 @@ public class UserAcessImpl implements IUserAcess {
     public CreateUserResponse createUser(CreateUserRequest request) {
         CreateUserResponse.DTO dto = CreateUserResponse.DTO.builder()
                 .username(request.getUsername())
+                .name(request.getName())
+                .email(request.getEmail())
                 .build();
 
         if (accessRepository.findByUsername(request.getUsername()).isEmpty()) {
@@ -44,6 +46,9 @@ public class UserAcessImpl implements IUserAcess {
             User user = new User();
             user.setUsername(request.getUsername());
             user.setStatus(true);
+            user.setName(request.getName());
+            user.setPassword(request.getPassword());
+            user.setEmail(request.getEmail());
             userRepository.save(user);
             return CreateUserResponse.buildResponse(dto, ResponseCode.SUCCESS);
         }
@@ -100,6 +105,8 @@ public class UserAcessImpl implements IUserAcess {
             return GetUserResponse.buildResponse(dto, ResponseCode.USERNAME_NOTFOUND);
         }
         dto.setStatus(user.isStatus());
+        dto.setEmail(user.getEmail());
+        dto.setName(user.getName());
         return GetUserResponse.buildResponse(dto, ResponseCode.SUCCESS);
     }
 

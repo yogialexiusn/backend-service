@@ -20,6 +20,8 @@ public class GetUserResponse extends BaseResponseDTO {
     public static class DTO {
         private String username;
         private boolean status;
+        private String name;
+        private String email;
     }
 
     public static GetUserResponse buildResponse(DTO detail, ResponseCode responseCode) {
