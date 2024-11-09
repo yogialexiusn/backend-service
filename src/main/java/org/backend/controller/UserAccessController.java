@@ -49,4 +49,10 @@ public class UserAccessController extends BaseController{
         return execute(iUserAcess.createAccess(request));
     }
 
+    @GetMapping(path = "/confirm")
+    public ResponseEntity<GetTokenResponse> confirm(@RequestParam("token") String token) {
+        return execute(iUserAcess.confirmToken(token));
+    }
+
+
 }

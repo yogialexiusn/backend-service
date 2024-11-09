@@ -2,8 +2,10 @@ package org.backend.service.impl;
 
 import org.backend.constant.ResponseCode;
 import org.backend.entity.Access;
+import org.backend.entity.Token;
 import org.backend.entity.User;
 import org.backend.repository.AccessRepository;
+import org.backend.repository.TokenRepository;
 import org.backend.repository.UserRepository;
 import org.backend.request.BlockUserRequest;
 import org.backend.request.CreateAccessRequest;
@@ -11,20 +13,35 @@ import org.backend.request.CreateUserRequest;
 import org.backend.response.GetUserAccessListResponse;
 import org.backend.response.embedded.*;
 import org.backend.service.IUserAcess;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.beans.factory.annotation.Value;
+
+import java.time.LocalDateTime;
 import java.util.*;
 
-@Service
-public class UserAcessImpl implements IUserAcess {
+    @Service
+    public class UserAcessImpl implements IUserAcess {
 
-    List<String> accessMenu = Arrays.asList("CAREER", "NEWS");
+        @Value("${spring.emailVerification}")
+        private boolean useEmailVerification;
 
-    private final AccessRepository accessRepository;
-    private final UserRepository userRepository;
+        List<String> accessMenu = Arrays.asList("CAREER", "NEWS");
+        private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    public UserAcessImpl(AccessRepository accessRepository, UserRepository userRepository) {
+        private final AccessRepository accessRepository;
+        private final UserRepository userRepository;
+        private final TokenRepository tokenRepository;
+        private final EmailImpl emailImpl;
+
+    public UserAcessImpl(BCryptPasswordEncoder bCryptPasswordEncoder, AccessRepository accessRepository, UserRepository userRepository, TokenRepository tokenRepository, EmailImpl emailImpl) {
+        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
         this.accessRepository = accessRepository;
         this.userRepository = userRepository;
+        this.tokenRepository = tokenRepository;
+        this.emailImpl = emailImpl;
     }
 
     @Override
@@ -35,7 +52,25 @@ public class UserAcessImpl implements IUserAcess {
                 .email(request.getEmail())
                 .build();
 
-        if (accessRepository.findByUsername(request.getUsername()).isEmpty()) {
+        User emailUsed = userRepository.findByEmail(request.getEmail());
+
+        if(emailUsed!=null){
+            return CreateUserResponse.buildResponse(dto, ResponseCode.EMAIL_ALREADY_USE);
+        }
+
+        User user = userRepository.findByUsername(request.getUsername());
+        if(user==null){
+            user = new User();
+            user.setUsername(request.getUsername());
+            user.setStatus(true);
+            user.setName(request.getName());
+
+            String encodedPassword = bCryptPasswordEncoder
+                    .encode(request.getPassword());
+            user.setPassword(encodedPassword);
+            user.setEmail(request.getEmail());
+            userRepository.save(user);
+
             for (String menu : accessMenu) {
                 Access access = new Access();
                 access.setUsername(request.getUsername());
@@ -43,13 +78,22 @@ public class UserAcessImpl implements IUserAcess {
                 access.setMenuAccess(menu);
                 accessRepository.save(access);
             }
-            User user = new User();
-            user.setUsername(request.getUsername());
-            user.setStatus(true);
-            user.setName(request.getName());
-            user.setPassword(request.getPassword());
-            user.setEmail(request.getEmail());
-            userRepository.save(user);
+
+            if(useEmailVerification){
+                String tokenString = UUID.randomUUID().toString();
+                Token token = new Token(
+                        tokenString,
+                        LocalDateTime.now(),
+                        LocalDateTime.now().plusMinutes(15),
+                        user
+                );
+                tokenRepository.save(token);
+
+                String link = "http://localhost:8080/api/users/confirm?token=" + tokenString;
+                emailImpl.send(
+                        request.getEmail(),
+                        emailImpl.buildEmail(request.getName(), link));
+            }
             return CreateUserResponse.buildResponse(dto, ResponseCode.SUCCESS);
         }
         return CreateUserResponse.buildResponse(dto, ResponseCode.ACCOUNT_ALREADY_EXIST);
@@ -126,4 +170,29 @@ public class UserAcessImpl implements IUserAcess {
                 .toList();
         return GetUserAccessListResponse.buildResponse(userAccessResponses, ResponseCode.SUCCESS);
     }
+
+        @Transactional
+        public GetTokenResponse confirmToken(String tokenString){
+
+            Token token = tokenRepository.findByToken(tokenString);
+            if(token==null){
+                return GetTokenResponse.buildResponse(null, ResponseCode.TOKEN_NOTFOUND);
+            }
+            if (token.getConfirmedAt() != null) {
+                return GetTokenResponse.buildResponse(null, ResponseCode.TOKEN_ALREADY_CONFIRMED);
+            }
+            LocalDateTime expiredAt = token.getExpiresAt();
+            if (expiredAt.isBefore(LocalDateTime.now())) {
+                return GetTokenResponse.buildResponse(null, ResponseCode.TOKEN_EXPIRED);
+            }
+
+            User user = userRepository.findByUsername(token.getUser().getUsername());
+            if(user==null){
+                return GetTokenResponse.buildResponse(null, ResponseCode.USERNAME_NOTFOUND);
+            }
+            token.setConfirmedAt(LocalDateTime.now());
+            user.setVerification(true);
+            return GetTokenResponse.buildResponse(null, ResponseCode.SUCCESS);
+
+        }
 }

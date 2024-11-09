@@ -1,5 +1,6 @@
 # Konfigurasi default
 spring:
+  emailVerification: false
   application:
     name: BackendServiceApplication
   config:
@@ -8,8 +9,24 @@ spring:
     hibernate:
       ddl-auto: create-drop
       dialect: org.hibernate.dialect.PostgreSQLDialect
-
     show-sql: true
-
+  autoconfigure:
+    exclude: org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
+  mail:
+    host: localhost
+    port: 1025
+    username: hello
+    password: hello
+    properties:
+      mail:
+        smtp:
+          ssl:
+            trust: "*"
+          auth: true
+          starttls:
+            enable: true
+          connectiontimeout: 5000
+          timeout: 3000
+          writetimeout: 5000
 server:
   port: 8080
