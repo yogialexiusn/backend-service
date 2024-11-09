@@ -100,3 +100,7 @@ Asrc/main/java/org/backend/response/embedded/GetTokenResponse.java,5\c\5c55b56e
 -src/main/java/org/backend/service/IToken.java,2\f\2fbdc1ca7bcaa4089fd06783f31eff8b325c81ef
 e
 5src/main/java/org/backend/service/impl/TokenImpl.java,d\4\d4ee0afce57f380a6bf359404de98c375b199204
+c
+3src/main/java/org/backend/request/LoginRequest.java,e\6\e63a3658962a1f53ed5c9af805e651484997a9e6
+n
+>src/main/java/org/backend/response/embedded/LoginResponse.java,d\2\d2623c27e10feb357aeb791d0fcfdf22ee5d3e0a

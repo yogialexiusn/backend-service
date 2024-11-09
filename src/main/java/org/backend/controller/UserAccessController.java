@@ -3,6 +3,7 @@ package org.backend.controller;
 import org.backend.request.BlockUserRequest;
 import org.backend.request.CreateAccessRequest;
 import org.backend.request.CreateUserRequest;
+import org.backend.request.LoginRequest;
 import org.backend.response.GetUserAccessListResponse;
 import org.backend.response.embedded.*;
 import org.backend.service.IUserAcess;
@@ -52,6 +53,12 @@ public class UserAccessController extends BaseController{
     @GetMapping(path = "/confirm")
     public ResponseEntity<GetTokenResponse> confirm(@RequestParam("token") String token) {
         return execute(iUserAcess.confirmToken(token));
+    }
+
+    @PostMapping("/login")
+    @CrossOrigin(origins = "*")
+    public ResponseEntity<GetUserAccessListResponse> login(@RequestBody LoginRequest request) {
+        return execute(iUserAcess.login(request));
     }
 
 

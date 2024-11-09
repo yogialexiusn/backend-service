@@ -3,6 +3,7 @@ package org.backend.service;
 import org.backend.request.BlockUserRequest;
 import org.backend.request.CreateAccessRequest;
 import org.backend.request.CreateUserRequest;
+import org.backend.request.LoginRequest;
 import org.backend.response.GetUserAccessListResponse;
 import org.backend.response.embedded.*;
 
@@ -13,5 +14,6 @@ public interface IUserAcess {
     GetUserResponse getUser(String username);
     GetUserAccessListResponse getUserAccess(String username);
     GetTokenResponse confirmToken(String tokenString);
+    GetUserAccessListResponse login(LoginRequest request);
 
 }

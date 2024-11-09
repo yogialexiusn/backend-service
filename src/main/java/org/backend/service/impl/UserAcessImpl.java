@@ -10,6 +10,7 @@ import org.backend.repository.UserRepository;
 import org.backend.request.BlockUserRequest;
 import org.backend.request.CreateAccessRequest;
 import org.backend.request.CreateUserRequest;
+import org.backend.request.LoginRequest;
 import org.backend.response.GetUserAccessListResponse;
 import org.backend.response.embedded.*;
 import org.backend.service.IUserAcess;
@@ -17,24 +18,23 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.beans.factory.annotation.Value;
 
 import java.time.LocalDateTime;
 import java.util.*;
 
-    @Service
-    public class UserAcessImpl implements IUserAcess {
+@Service
+public class UserAcessImpl implements IUserAcess {
 
-        @Value("${spring.emailVerification}")
-        private boolean useEmailVerification;
+    @Value("${spring.emailVerification}")
+    private boolean useEmailVerification;
 
-        List<String> accessMenu = Arrays.asList("CAREER", "NEWS");
-        private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    List<String> accessMenu = Arrays.asList("CAREER", "NEWS");
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
-        private final AccessRepository accessRepository;
-        private final UserRepository userRepository;
-        private final TokenRepository tokenRepository;
-        private final EmailImpl emailImpl;
+    private final AccessRepository accessRepository;
+    private final UserRepository userRepository;
+    private final TokenRepository tokenRepository;
+    private final EmailImpl emailImpl;
 
     public UserAcessImpl(BCryptPasswordEncoder bCryptPasswordEncoder, AccessRepository accessRepository, UserRepository userRepository, TokenRepository tokenRepository, EmailImpl emailImpl) {
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
@@ -171,28 +171,59 @@ import java.util.*;
         return GetUserAccessListResponse.buildResponse(userAccessResponses, ResponseCode.SUCCESS);
     }
 
-        @Transactional
-        public GetTokenResponse confirmToken(String tokenString){
+    @Transactional
+    public GetTokenResponse confirmToken(String tokenString){
 
-            Token token = tokenRepository.findByToken(tokenString);
-            if(token==null){
-                return GetTokenResponse.buildResponse(null, ResponseCode.TOKEN_NOTFOUND);
-            }
-            if (token.getConfirmedAt() != null) {
-                return GetTokenResponse.buildResponse(null, ResponseCode.TOKEN_ALREADY_CONFIRMED);
-            }
-            LocalDateTime expiredAt = token.getExpiresAt();
-            if (expiredAt.isBefore(LocalDateTime.now())) {
-                return GetTokenResponse.buildResponse(null, ResponseCode.TOKEN_EXPIRED);
-            }
-
-            User user = userRepository.findByUsername(token.getUser().getUsername());
-            if(user==null){
-                return GetTokenResponse.buildResponse(null, ResponseCode.USERNAME_NOTFOUND);
-            }
-            token.setConfirmedAt(LocalDateTime.now());
-            user.setVerification(true);
-            return GetTokenResponse.buildResponse(null, ResponseCode.SUCCESS);
-
+        Token token = tokenRepository.findByToken(tokenString);
+        if(token==null){
+            return GetTokenResponse.buildResponse(null, ResponseCode.TOKEN_NOTFOUND);
         }
+        if (token.getConfirmedAt() != null) {
+            return GetTokenResponse.buildResponse(null, ResponseCode.TOKEN_ALREADY_CONFIRMED);
+        }
+        LocalDateTime expiredAt = token.getExpiresAt();
+        if (expiredAt.isBefore(LocalDateTime.now())) {
+            return GetTokenResponse.buildResponse(null, ResponseCode.TOKEN_EXPIRED);
+        }
+
+        User user = userRepository.findByUsername(token.getUser().getUsername());
+        if(user==null){
+            return GetTokenResponse.buildResponse(null, ResponseCode.USERNAME_NOTFOUND);
+        }
+        token.setConfirmedAt(LocalDateTime.now());
+        user.setVerification(true);
+        return GetTokenResponse.buildResponse(null, ResponseCode.SUCCESS);
+    }
+
+    public GetUserAccessListResponse login(LoginRequest request) {
+        String identity;
+        // Check if username is blank, use email if username is blank
+        if (request.getUsername() != null && !request.getUsername().isBlank()) {
+            identity = request.getUsername();
+        }
+        // If username is blank, check if email is provided
+        else if (request.getEmail() != null && !request.getEmail().isBlank()) {
+            identity = request.getEmail();
+        }
+        else {
+            return GetUserAccessListResponse.buildResponse(Collections.emptyList(), ResponseCode.USERNAME_OR_EMAIL_ISNOTNULL);
+        }
+
+        User user = userRepository.findByUsername(identity);
+        if (user == null) {
+            user = userRepository.findByEmail(identity);
+        }
+        if (user != null) {
+            // Validate the password
+            boolean passwordMatches = bCryptPasswordEncoder.matches(request.getPassword(), user.getPassword());
+            if (!passwordMatches) {
+                return GetUserAccessListResponse.buildResponse(Collections.emptyList(), ResponseCode.INVALID_PASSWORD);
+            }
+//            String token = generateJwtToken(user);
+//            dto.setToken(token);
+            return getUserAccess(request.getUsername());
+        }
+        return GetUserAccessListResponse.buildResponse(Collections.emptyList(), ResponseCode.USERNAME_OR_EMAIL_NOTFOUND);
+    }
+
 }
