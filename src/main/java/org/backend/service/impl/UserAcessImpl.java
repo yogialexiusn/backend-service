@@ -1,7 +1,9 @@
 package org.backend.service.impl;
 
+import org.backend.config.ReloadMenuConfig;
 import org.backend.constant.ResponseCode;
 import org.backend.entity.Access;
+import org.backend.entity.Menu;
 import org.backend.entity.Token;
 import org.backend.entity.User;
 import org.backend.repository.AccessRepository;
@@ -29,14 +31,15 @@ public class UserAcessImpl implements IUserAcess {
     private boolean useEmailVerification;
 
     List<String> accessMenu = Arrays.asList("CAREER", "NEWS");
+    private final ReloadMenuConfig reloadMenuConfig;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
-
     private final AccessRepository accessRepository;
     private final UserRepository userRepository;
     private final TokenRepository tokenRepository;
     private final EmailImpl emailImpl;
 
-    public UserAcessImpl(BCryptPasswordEncoder bCryptPasswordEncoder, AccessRepository accessRepository, UserRepository userRepository, TokenRepository tokenRepository, EmailImpl emailImpl) {
+    public UserAcessImpl(ReloadMenuConfig reloadMenuConfig, BCryptPasswordEncoder bCryptPasswordEncoder, AccessRepository accessRepository, UserRepository userRepository, TokenRepository tokenRepository, EmailImpl emailImpl) {
+        this.reloadMenuConfig = reloadMenuConfig;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
         this.accessRepository = accessRepository;
         this.userRepository = userRepository;
@@ -71,11 +74,12 @@ public class UserAcessImpl implements IUserAcess {
             user.setEmail(request.getEmail());
             userRepository.save(user);
 
-            for (String menu : accessMenu) {
+            List<Menu> test = reloadMenuConfig.getActiveMenus();
+            for (Menu menu : test) {
                 Access access = new Access();
                 access.setUsername(request.getUsername());
                 access.setRoleName(request.getRole());
-                access.setMenuAccess(menu);
+                access.setMenuAccess(menu.getText());
                 accessRepository.save(access);
             }
 
@@ -159,15 +163,18 @@ public class UserAcessImpl implements IUserAcess {
         if (accessList == null || accessList.isEmpty()) {
             return GetUserAccessListResponse.buildResponse(Collections.emptyList(), ResponseCode.USER_ACCESS_NOTFOUND);
         }
-        List<GetUserAccessResponse> userAccessResponses = accessList.stream()
-                .map(access -> new GetUserAccessResponse(
-                        access.getUsername(),
-                        access.getMenuAccess(),
-                        access.getRoleName(),
-                        access.getCreatedTime(),
-                        access.getUpdatedTime()
-                ))
-                .toList();
+        List<Menu> reloadMenu = reloadMenuConfig.getActiveMenus();
+        List<GetUserAccessResponse> userAccessResponses = new ArrayList<>();
+        for (Menu menu : reloadMenu) {
+            GetUserAccessResponse getUserAccessResponse = new GetUserAccessResponse();
+            getUserAccessResponse.setHeading(menu.getHeading());
+            getUserAccessResponse.setIcon(menu.getIcon());
+            getUserAccessResponse.setText(menu.getText());
+            getUserAccessResponse.setLink(menu.getLink());
+//            getUserAccessResponse.setSubMenu(menu.getSubMenu());
+            userAccessResponses.add(getUserAccessResponse);
+        }
+
         return GetUserAccessListResponse.buildResponse(userAccessResponses, ResponseCode.SUCCESS);
     }
 

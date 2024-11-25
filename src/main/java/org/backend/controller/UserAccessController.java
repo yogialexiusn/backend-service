@@ -41,6 +41,7 @@ public class UserAccessController extends BaseController{
     }
 
     @GetMapping("/access/{username}")
+    @CrossOrigin(origins = "*")
     public ResponseEntity<GetUserAccessListResponse> getUserAccess(@PathVariable String username) {
         return execute(iUserAcess.getUserAccess(username));
     }

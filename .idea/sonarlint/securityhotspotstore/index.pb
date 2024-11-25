@@ -84,8 +84,6 @@ g
 7src/main/java/org/backend/security/PasswordEncoder.java,9\3\935f9f84fecef0fd6ae6ef0e957541c9764768df
 g
 7src/main/java/org/backend/config/WebSecurityConfig.java,2\1\21a3e726be0a0ac726792f738916f796e12014cd
-g
-7src/main/java/org/backend/entity/ConfirmationToken.java,0\9\09adb7e476932fd4b046f2b4d29177c8db66e7d7
 [
 +src/main/java/org/backend/entity/Token.java,7\6\76ddb3baba5674d9a8f46a254c946a0dcb44d2b2
 i
@@ -102,5 +100,13 @@ e
 5src/main/java/org/backend/service/impl/TokenImpl.java,d\4\d4ee0afce57f380a6bf359404de98c375b199204
 c
 3src/main/java/org/backend/request/LoginRequest.java,e\6\e63a3658962a1f53ed5c9af805e651484997a9e6
-n
->src/main/java/org/backend/response/embedded/LoginResponse.java,d\2\d2623c27e10feb357aeb791d0fcfdf22ee5d3e0a
+Z
+*src/main/java/org/backend/entity/Menu.java,f\e\fee54888a8e9f7000cd6dd0ccf9dc6f34a1793e2
+h
+8src/main/java/org/backend/repository/MenuRepository.java,7\9\79115f4397d4c99086acbc7e876cb81013fd0d37
+f
+6src/main/java/org/backend/config/InjectDataConfig.java,1\4\140b3d1b3547858b4ad4cbe14482dc35588f4ae6
+`
+0src/main/java/org/backend/config/ReloadMenu.java,3\8\382cbb9aa748b967f1cdfd50f10713d52d070e83
+f
+6src/main/java/org/backend/config/ReloadMenuConfig.java,d\6\d63ff5a8301821d70de8f1e04dc100455378e0b7
