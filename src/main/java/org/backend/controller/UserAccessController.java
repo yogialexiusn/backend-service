@@ -30,8 +30,7 @@ public class UserAccessController extends BaseController{
     }
 
     @PostMapping
-    @CrossOrigin(origins = "*")
-    public ResponseEntity<CreateUserResponse> createUser(@RequestBody @Valid CreateUserRequest request) {
+    public ResponseEntity<UserResponse> createUser(@RequestBody @Valid CreateUserRequest request) {
         return execute(iUserAcess.createUser(request));
     }
 
@@ -41,7 +40,6 @@ public class UserAccessController extends BaseController{
     }
 
     @GetMapping("/access/{username}")
-    @CrossOrigin(origins = "*")
     public ResponseEntity<GetUserAccessListResponse> getUserAccess(@PathVariable String username) {
         return execute(iUserAcess.getUserAccess(username));
     }
@@ -57,7 +55,6 @@ public class UserAccessController extends BaseController{
     }
 
     @PostMapping("/login")
-    @CrossOrigin(origins = "*")
     public ResponseEntity<GetUserAccessListResponse> login(@RequestBody LoginRequest request) {
         return execute(iUserAcess.login(request));
     }

@@ -1,8 +1,8 @@
 package org.backend.entity;
 
+import jakarta.persistence.*;
 import lombok.*;
 
-import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Data
@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "t_token")
+@Table(name = "t_token_verification")
 public class Token {
 
     @SequenceGenerator(

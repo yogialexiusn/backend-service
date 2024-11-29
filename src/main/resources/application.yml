@@ -1,4 +1,8 @@
 # Konfigurasi default
+security:
+  jwt:
+    token:
+      secret-key: my-secret-key
 spring:
   emailVerification: false
   application:
@@ -10,8 +14,6 @@ spring:
       ddl-auto: create-drop
       dialect: org.hibernate.dialect.PostgreSQLDialect
     show-sql: true
-  autoconfigure:
-    exclude: org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
   mail:
     host: localhost
     port: 1025

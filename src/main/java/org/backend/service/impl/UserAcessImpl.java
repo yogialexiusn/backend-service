@@ -1,11 +1,14 @@
 package org.backend.service.impl;
 
+import lombok.extern.slf4j.Slf4j;
 import org.backend.config.ReloadMenuConfig;
+import org.backend.config.UserAuthenticationProvider;
 import org.backend.constant.ResponseCode;
 import org.backend.entity.Access;
 import org.backend.entity.Menu;
 import org.backend.entity.Token;
 import org.backend.entity.User;
+import org.backend.mapper.UserMapper;
 import org.backend.repository.AccessRepository;
 import org.backend.repository.TokenRepository;
 import org.backend.repository.UserRepository;
@@ -25,6 +28,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
+@Slf4j
 public class UserAcessImpl implements IUserAcess {
 
     @Value("${spring.emailVerification}")
@@ -37,19 +41,23 @@ public class UserAcessImpl implements IUserAcess {
     private final UserRepository userRepository;
     private final TokenRepository tokenRepository;
     private final EmailImpl emailImpl;
+    private final UserAuthenticationProvider userAuthenticationProvider;
+    private final UserMapper userMapper;
 
-    public UserAcessImpl(ReloadMenuConfig reloadMenuConfig, BCryptPasswordEncoder bCryptPasswordEncoder, AccessRepository accessRepository, UserRepository userRepository, TokenRepository tokenRepository, EmailImpl emailImpl) {
+    public UserAcessImpl(ReloadMenuConfig reloadMenuConfig, BCryptPasswordEncoder bCryptPasswordEncoder, AccessRepository accessRepository, UserRepository userRepository, TokenRepository tokenRepository, EmailImpl emailImpl, UserAuthenticationProvider userAuthenticationProvider, UserMapper userMapper) {
         this.reloadMenuConfig = reloadMenuConfig;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
         this.accessRepository = accessRepository;
         this.userRepository = userRepository;
         this.tokenRepository = tokenRepository;
         this.emailImpl = emailImpl;
+        this.userAuthenticationProvider = userAuthenticationProvider;
+        this.userMapper = userMapper;
     }
 
     @Override
-    public CreateUserResponse createUser(CreateUserRequest request) {
-        CreateUserResponse.DTO dto = CreateUserResponse.DTO.builder()
+    public UserResponse createUser(CreateUserRequest request) {
+        UserResponse.DTO dto = UserResponse.DTO.builder()
                 .username(request.getUsername())
                 .name(request.getName())
                 .email(request.getEmail())
@@ -58,7 +66,7 @@ public class UserAcessImpl implements IUserAcess {
         User emailUsed = userRepository.findByEmail(request.getEmail());
 
         if(emailUsed!=null){
-            return CreateUserResponse.buildResponse(dto, ResponseCode.EMAIL_ALREADY_USE);
+            return UserResponse.buildResponse(dto, ResponseCode.EMAIL_ALREADY_USE);
         }
 
         User user = userRepository.findByUsername(request.getUsername());
@@ -84,23 +92,25 @@ public class UserAcessImpl implements IUserAcess {
             }
 
             if(useEmailVerification){
-                String tokenString = UUID.randomUUID().toString();
+                String tokenVerification = UUID.randomUUID().toString();
                 Token token = new Token(
-                        tokenString,
+                        tokenVerification,
                         LocalDateTime.now(),
                         LocalDateTime.now().plusMinutes(15),
                         user
                 );
                 tokenRepository.save(token);
 
-                String link = "http://localhost:8080/api/users/confirm?token=" + tokenString;
+                String link = "http://localhost:8080/api/users/confirm?token=" + tokenVerification;
                 emailImpl.send(
                         request.getEmail(),
                         emailImpl.buildEmail(request.getName(), link));
             }
-            return CreateUserResponse.buildResponse(dto, ResponseCode.SUCCESS);
+
+            dto.setTokenJwt(userAuthenticationProvider.createToken(dto));
+            return UserResponse.buildResponse(dto, ResponseCode.SUCCESS);
         }
-        return CreateUserResponse.buildResponse(dto, ResponseCode.ACCOUNT_ALREADY_EXIST);
+        return UserResponse.buildResponse(dto, ResponseCode.ACCOUNT_ALREADY_EXIST);
     }
 
     @Override
@@ -231,6 +241,15 @@ public class UserAcessImpl implements IUserAcess {
             return getUserAccess(request.getUsername());
         }
         return GetUserAccessListResponse.buildResponse(Collections.emptyList(), ResponseCode.USERNAME_OR_EMAIL_NOTFOUND);
+    }
+
+    public UserResponse.DTO findByUsername(String username) {
+        User user = userRepository.findByUsername(username);
+        if(user==null){
+            log.error("cannot find username login {}", username);
+            return null;
+        }
+        return userMapper.toUserDto(user);
     }
 
 }

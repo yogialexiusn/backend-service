@@ -9,7 +9,7 @@ import org.backend.response.BaseResponseDTO;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class CreateUserResponse extends BaseResponseDTO {
+public class UserResponse extends BaseResponseDTO {
 
     private DTO detail;
 
@@ -21,10 +21,12 @@ public class CreateUserResponse extends BaseResponseDTO {
         private String username;
         private String name;
         private String email;
+        private String tokenJwt;
+        private String login;
     }
 
-    public static CreateUserResponse buildResponse(DTO detail, ResponseCode responseCode) {
-        CreateUserResponse response = new CreateUserResponse();
+    public static UserResponse buildResponse(DTO detail, ResponseCode responseCode) {
+        UserResponse response = new UserResponse();
         response.setResponse(ResponseDTO.toResponse(responseCode));
         response.setDetail(detail);
         return response;
