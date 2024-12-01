@@ -22,7 +22,6 @@ public class UserResponse extends BaseResponseDTO {
         private String name;
         private String email;
         private String tokenJwt;
-        private String login;
     }
 
     public static UserResponse buildResponse(DTO detail, ResponseCode responseCode) {

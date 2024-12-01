@@ -8,7 +8,6 @@ import org.backend.entity.Access;
 import org.backend.entity.Menu;
 import org.backend.entity.Token;
 import org.backend.entity.User;
-import org.backend.mapper.UserMapper;
 import org.backend.repository.AccessRepository;
 import org.backend.repository.TokenRepository;
 import org.backend.repository.UserRepository;
@@ -42,9 +41,8 @@ public class UserAcessImpl implements IUserAcess {
     private final TokenRepository tokenRepository;
     private final EmailImpl emailImpl;
     private final UserAuthenticationProvider userAuthenticationProvider;
-    private final UserMapper userMapper;
 
-    public UserAcessImpl(ReloadMenuConfig reloadMenuConfig, BCryptPasswordEncoder bCryptPasswordEncoder, AccessRepository accessRepository, UserRepository userRepository, TokenRepository tokenRepository, EmailImpl emailImpl, UserAuthenticationProvider userAuthenticationProvider, UserMapper userMapper) {
+    public UserAcessImpl(ReloadMenuConfig reloadMenuConfig, BCryptPasswordEncoder bCryptPasswordEncoder, AccessRepository accessRepository, UserRepository userRepository, TokenRepository tokenRepository, EmailImpl emailImpl, UserAuthenticationProvider userAuthenticationProvider) {
         this.reloadMenuConfig = reloadMenuConfig;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
         this.accessRepository = accessRepository;
@@ -52,7 +50,6 @@ public class UserAcessImpl implements IUserAcess {
         this.tokenRepository = tokenRepository;
         this.emailImpl = emailImpl;
         this.userAuthenticationProvider = userAuthenticationProvider;
-        this.userMapper = userMapper;
     }
 
     @Override
@@ -242,14 +239,4 @@ public class UserAcessImpl implements IUserAcess {
         }
         return GetUserAccessListResponse.buildResponse(Collections.emptyList(), ResponseCode.USERNAME_OR_EMAIL_NOTFOUND);
     }
-
-    public UserResponse.DTO findByUsername(String username) {
-        User user = userRepository.findByUsername(username);
-        if(user==null){
-            log.error("cannot find username login {}", username);
-            return null;
-        }
-        return userMapper.toUserDto(user);
-    }
-
 }

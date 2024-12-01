@@ -5,10 +5,10 @@ import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import jakarta.annotation.PostConstruct;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.backend.entity.User;
+import org.backend.repository.UserRepository;
 import org.backend.response.embedded.UserResponse;
-import org.backend.service.impl.UserAcessImpl;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -18,7 +18,6 @@ import java.util.Base64;
 import java.util.Collections;
 import java.util.Date;
 
-@RequiredArgsConstructor
 @Component
 @Slf4j
 public class UserAuthenticationProvider {
@@ -26,10 +25,10 @@ public class UserAuthenticationProvider {
     @Value("${security.jwt.token.secret-key}")
     private String secretKey;
 
-    private UserAcessImpl userService;
+    private final UserRepository userRepository;
 
-    public UserAuthenticationProvider(UserAcessImpl userService) {
-        this.userService = userService;
+    public UserAuthenticationProvider(UserRepository userRepository) {
+        this.userRepository = userRepository;
     }
 
     @PostConstruct
@@ -55,7 +54,7 @@ public class UserAuthenticationProvider {
                 .build();
         DecodedJWT decoded = verifier.verify(token);
         UserResponse.DTO user = UserResponse.DTO.builder()
-                .login(decoded.getSubject())
+                .username(decoded.getSubject())
                 .name(decoded.getClaim("name").asString())
                 .build();
 
@@ -67,9 +66,23 @@ public class UserAuthenticationProvider {
         JWTVerifier verifier = JWT.require(algorithm)
                 .build();
         DecodedJWT decoded = verifier.verify(token);
-        UserResponse.DTO user = userService.findByUsername(decoded.getSubject());
+        UserResponse.DTO user = findByUsername(decoded.getSubject());
 
         return new UsernamePasswordAuthenticationToken(user, null, Collections.emptyList());
+    }
+
+    private UserResponse.DTO findByUsername(String username) {
+        User user = userRepository.findByUsername(username);
+        if(user==null){
+            log.error("cannot find username login {}", username);
+            return null;
+        }
+
+        return UserResponse.DTO.builder().
+                name(user.getName()).
+                username(user.getUsername()).
+                email(user.getEmail()).
+                build();
     }
 
 }
