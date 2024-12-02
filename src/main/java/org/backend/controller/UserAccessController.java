@@ -55,7 +55,7 @@ public class UserAccessController extends BaseController{
     }
 
     @PostMapping("/login")
-    public ResponseEntity<GetUserAccessListResponse> login(@RequestBody LoginRequest request) {
+    public ResponseEntity<UserResponse> login(@RequestBody LoginRequest request) {
         return execute(iUserAcess.login(request));
     }
 

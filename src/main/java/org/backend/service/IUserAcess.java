@@ -14,6 +14,6 @@ public interface IUserAcess {
     GetUserResponse getUser(String username);
     GetUserAccessListResponse getUserAccess(String username);
     GetTokenResponse confirmToken(String tokenString);
-    GetUserAccessListResponse login(LoginRequest request);
+    UserResponse login(LoginRequest request);
 
 }

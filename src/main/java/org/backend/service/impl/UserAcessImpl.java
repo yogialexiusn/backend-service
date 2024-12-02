@@ -209,7 +209,12 @@ public class UserAcessImpl implements IUserAcess {
         return GetTokenResponse.buildResponse(null, ResponseCode.SUCCESS);
     }
 
-    public GetUserAccessListResponse login(LoginRequest request) {
+    public UserResponse login(LoginRequest request) {
+        UserResponse.DTO dto = UserResponse.DTO.builder()
+                .username(request.getUsername())
+                .email(request.getEmail())
+                .build();
+
         String identity;
         // Check if username is blank, use email if username is blank
         if (request.getUsername() != null && !request.getUsername().isBlank()) {
@@ -220,7 +225,7 @@ public class UserAcessImpl implements IUserAcess {
             identity = request.getEmail();
         }
         else {
-            return GetUserAccessListResponse.buildResponse(Collections.emptyList(), ResponseCode.USERNAME_OR_EMAIL_ISNOTNULL);
+            return UserResponse.buildResponse( null, ResponseCode.USERNAME_OR_EMAIL_ISNOTNULL);
         }
 
         User user = userRepository.findByUsername(identity);
@@ -231,12 +236,12 @@ public class UserAcessImpl implements IUserAcess {
             // Validate the password
             boolean passwordMatches = bCryptPasswordEncoder.matches(request.getPassword(), user.getPassword());
             if (!passwordMatches) {
-                return GetUserAccessListResponse.buildResponse(Collections.emptyList(), ResponseCode.INVALID_PASSWORD);
+                return UserResponse.buildResponse(null, ResponseCode.INVALID_PASSWORD);
             }
-//            String token = generateJwtToken(user);
-//            dto.setToken(token);
-            return getUserAccess(request.getUsername());
+
+            dto.setTokenJwt(userAuthenticationProvider.createToken(dto));
+            return UserResponse.buildResponse(dto, ResponseCode.SUCCESS);
         }
-        return GetUserAccessListResponse.buildResponse(Collections.emptyList(), ResponseCode.USERNAME_OR_EMAIL_NOTFOUND);
+        return UserResponse.buildResponse(null, ResponseCode.USERNAME_OR_EMAIL_NOTFOUND);
     }
 }
