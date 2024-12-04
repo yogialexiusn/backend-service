@@ -12,7 +12,7 @@ public class CreateUserRequest {
     private String username;
 
     @NotBlank(message = "NotBlank")
-    @ValueMustValid(valueAllowed = {"SUPERADMIN", "ADMIN", "VIEWER"})
+    @ValueMustValid(valueAllowed = {"Superadmin", "Admin", "User"})
     private String role;
 
     @NotBlank(message = "NotBlank")
